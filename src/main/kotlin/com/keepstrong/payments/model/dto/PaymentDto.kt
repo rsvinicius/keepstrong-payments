@@ -4,13 +4,13 @@ import com.keepstrong.payments.model.entity.Status
 import java.math.BigDecimal
 
 data class PaymentDto(
-    private val id: Long,
-    private val value: BigDecimal,
-    private val name: String,
-    private val cardNumber: String,
-    private val expirationDate: String,
-    private val cardCode: String,
-    private val status: Status,
-    private val orderId: Long,
-    private val paymentMethodId: Long
+    val id: Long,
+    val value: BigDecimal,
+    val name: String,
+    val cardNumber: String,
+    val expirationDate: String,
+    val cardCode: String,
+    var status: Status,
+    val orderId: Long,
+    val paymentMethodId: Long
 )

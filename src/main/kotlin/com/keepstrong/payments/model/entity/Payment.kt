@@ -18,35 +18,35 @@ import javax.validation.constraints.Size
 data class Payment(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private val id: Long,
+    val id: Long,
 
     @Positive
     @NotNull
-    private val value: BigDecimal,
+    val value: BigDecimal,
 
     @NotBlank
     @Size(max = 100)
-    private val name: String,
+    val name: String,
 
     @NotBlank
     @Size(max = 19)
-    private val cardNumber: String,
+    val cardNumber: String,
 
     @NotBlank
     @Size(max = 7)
-    private val expirationDate: String,
+    val expirationDate: String,
 
     @NotBlank
     @Size(min= 3, max = 3)
-    private val cardCode: String,
+    val cardCode: String,
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private val status: Status,
+    var status: Status,
 
     @NotNull
-    private val orderId: Long,
+    val orderId: Long,
 
     @NotNull
-    private val paymentMethodId: Long
+    val paymentMethodId: Long
 )
