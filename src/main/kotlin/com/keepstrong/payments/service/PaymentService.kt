@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import javax.persistence.EntityNotFoundException
 
-
 @Service
 class PaymentService(
     private val paymentRepository: PaymentRepository,
@@ -29,14 +28,20 @@ class PaymentService(
     }
 
     fun createPayment(paymentDto: PaymentDto): PaymentDto {
-        val payment = objectMapper.convertValue(paymentDto, Payment::class.java).apply { status = Status.CREATED }
+        val payment = objectMapper.convertValue(paymentDto, Payment::class.java).apply {
+            status = Status.CREATED
+        }
+
         paymentRepository.save(payment)
 
         return objectMapper.convertValue(payment, PaymentDto::class.java)
     }
 
     fun updatePayment(id: Long, paymentDto: PaymentDto): PaymentDto {
-        val payment = objectMapper.convertValue(paymentDto, Payment::class.java).apply { id = paymentDto.id }
+        val payment = objectMapper.convertValue(paymentDto, Payment::class.java).apply {
+            this.id = paymentDto.id
+        }
+
         paymentRepository.save(payment)
 
         return objectMapper.convertValue(payment, PaymentDto::class.java)

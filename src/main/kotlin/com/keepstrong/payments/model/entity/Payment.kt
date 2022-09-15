@@ -18,7 +18,7 @@ import javax.validation.constraints.Size
 data class Payment(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
+    var id: Long,
 
     @Positive
     @NotNull
