@@ -3,7 +3,7 @@ package com.keepstrong.payments.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.keepstrong.payments.model.dto.PaymentDto
 import com.keepstrong.payments.model.entity.Payment
-import com.keepstrong.payments.model.entity.Status
+import com.keepstrong.payments.model.Status
 import com.keepstrong.payments.repository.PaymentRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

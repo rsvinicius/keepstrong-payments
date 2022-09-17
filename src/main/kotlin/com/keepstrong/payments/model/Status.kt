@@ -1,4 +1,4 @@
-package com.keepstrong.payments.model.entity
+package com.keepstrong.payments.model
 
 enum class Status {
     CREATED,

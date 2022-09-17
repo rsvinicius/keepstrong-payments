@@ -1,6 +1,6 @@
 package com.keepstrong.payments.model.dto
 
-import com.keepstrong.payments.model.entity.Status
+import com.keepstrong.payments.model.Status
 import java.math.BigDecimal
 
 data class PaymentDto(

@@ -1,5 +1,6 @@
 package com.keepstrong.payments.model.entity
 
+import com.keepstrong.payments.model.Status
 import java.math.BigDecimal
 import javax.persistence.Entity
 import javax.persistence.EnumType
