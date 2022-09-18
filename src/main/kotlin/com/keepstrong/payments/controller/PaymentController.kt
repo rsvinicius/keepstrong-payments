@@ -46,7 +46,7 @@ class PaymentController(private val paymentService: PaymentService) {
         return ResponseEntity.created(address).body(createdPaymentDto)
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     fun updatePayment(
         @PathVariable @NotNull id: Long,
         @RequestBody @Valid paymentDto: PaymentDto
@@ -56,7 +56,7 @@ class PaymentController(private val paymentService: PaymentService) {
         return ResponseEntity.ok(updatedPaymentDto)
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     fun deletePayment(@PathVariable @NotNull id: Long): ResponseEntity<PaymentDto> {
         paymentService.deletePayment(id)
 
