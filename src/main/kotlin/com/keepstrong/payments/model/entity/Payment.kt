@@ -43,7 +43,7 @@ data class Payment(
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    var status: Status,
+    var status: Status?,
 
     @NotNull
     val orderId: Long,
