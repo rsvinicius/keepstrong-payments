@@ -1,4 +1,9 @@
+server:
+  port: 0
+
 spring:
+  application:
+    name: payments-ms
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/keepstrong
@@ -9,3 +14,8 @@ spring:
     hibernate:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8081/eureka
