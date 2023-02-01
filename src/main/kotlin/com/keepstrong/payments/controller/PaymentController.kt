@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotNull
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
@@ -20,8 +22,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.util.UriComponentsBuilder
-import javax.validation.Valid
-import javax.validation.constraints.NotNull
 
 @Tag(name = "PaymentController")
 @RestController
@@ -55,8 +55,8 @@ class PaymentController(private val paymentService: PaymentService) {
     )
     @PostMapping
     fun registerPayment(
-        @RequestBody @Valid paymentDto: PaymentDto,
-        uriBuilder: UriComponentsBuilder
+            @RequestBody @Valid paymentDto: PaymentDto,
+            uriBuilder: UriComponentsBuilder
     ): ResponseEntity<PaymentDto> {
         val createdPaymentDto = paymentService.createPayment(paymentDto)
         val address = uriBuilder.path("/payments/{id}").buildAndExpand(createdPaymentDto.id).toUri()
