@@ -2,6 +2,10 @@ package com.keepstrong.payments.controller
 
 import com.keepstrong.payments.model.dto.PaymentDto
 import com.keepstrong.payments.service.PaymentService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
@@ -19,15 +23,25 @@ import org.springframework.web.util.UriComponentsBuilder
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
+@Tag(name = "PaymentController")
 @RestController
 @Validated
 @RequestMapping("/payments")
 class PaymentController(private val paymentService: PaymentService) {
+    @Operation(summary = "List all payments")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "All payments listed"),
+    )
     @GetMapping
     fun listAllPayments(@PageableDefault(size = 10) pageable: Pageable): Page<PaymentDto> {
         return paymentService.getAllPayments(pageable)
     }
 
+    @Operation(summary = "Get payment by id")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Payment found"),
+        ApiResponse(responseCode = "404", description = "Payment not found")
+    )
     @GetMapping("/{id}")
     fun getPaymentById(@PathVariable @NotNull id: Long): ResponseEntity<PaymentDto> {
         val paymentDto = paymentService.getPaymentById(id)
@@ -35,6 +49,10 @@ class PaymentController(private val paymentService: PaymentService) {
         return ResponseEntity.ok(paymentDto)
     }
 
+    @Operation(summary = "Create payment")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Payment created")
+    )
     @PostMapping
     fun registerPayment(
         @RequestBody @Valid paymentDto: PaymentDto,
@@ -46,6 +64,10 @@ class PaymentController(private val paymentService: PaymentService) {
         return ResponseEntity.created(address).body(createdPaymentDto)
     }
 
+    @Operation(summary = "Update payment")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Payment updated")
+    )
     @PutMapping("/{id}")
     fun updatePayment(
         @PathVariable @NotNull id: Long,
@@ -56,6 +78,10 @@ class PaymentController(private val paymentService: PaymentService) {
         return ResponseEntity.ok(updatedPaymentDto)
     }
 
+    @Operation(summary = "Delete payment")
+    @ApiResponses(
+        ApiResponse(responseCode = "204", description = "Payment deleted")
+    )
     @DeleteMapping("/{id}")
     fun deletePayment(@PathVariable @NotNull id: Long): ResponseEntity<PaymentDto> {
         paymentService.deletePayment(id)
