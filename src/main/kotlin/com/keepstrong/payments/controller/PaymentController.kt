@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -88,6 +89,19 @@ class PaymentController(private val paymentService: PaymentService) {
         paymentService.deletePayment(id)
 
         return ResponseEntity.noContent().build()
+    }
+
+    @Operation(summary = "Confirm payment")
+    @ApiResponses(
+        ApiResponse(responseCode = "200", description = "Payment confirmed")
+    )
+    @PatchMapping("/{id}/confirm")
+    fun confirmPayment(
+        @PathVariable @NotNull id: Long
+    ): ResponseEntity<Unit> {
+        paymentService.confirmPayment(id)
+
+        return ResponseEntity.ok().build()
     }
 
     @GetMapping("/port")

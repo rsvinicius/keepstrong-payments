@@ -1,6 +1,7 @@
 package com.keepstrong.payments.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.keepstrong.payments.client.OrdersClient
 import com.keepstrong.payments.model.Status
 import com.keepstrong.payments.model.dto.PaymentDto
 import com.keepstrong.payments.model.entity.Payment
@@ -13,42 +14,62 @@ import org.springframework.stereotype.Service
 @Service
 class PaymentService(
     private val paymentRepository: PaymentRepository,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val ordersClient: OrdersClient
 ) {
 
     fun getAllPayments(pageable: Pageable): Page<PaymentDto> {
         return paymentRepository
             .findAll(pageable)
-            .map { p -> objectMapper.convertValue(p, PaymentDto::class.java) }
+            .map { p -> convertPaymentToPaymentDto(p) }
     }
 
     fun getPaymentById(id: Long): PaymentDto {
-        val payment = paymentRepository.findById(id).orElseThrow { EntityNotFoundException() }
+        val payment = findPaymentById(id)
 
-        return objectMapper.convertValue(payment, PaymentDto::class.java)
+        return convertPaymentToPaymentDto(payment)
     }
 
     fun createPayment(paymentDto: PaymentDto): PaymentDto {
-        val payment = objectMapper.convertValue(paymentDto, Payment::class.java).apply {
+        val payment = convertPaymentDtoToPayment(paymentDto).apply {
             status = Status.CREATED
         }
 
         paymentRepository.save(payment)
 
-        return objectMapper.convertValue(payment, PaymentDto::class.java)
+        return convertPaymentToPaymentDto(payment)
     }
 
     fun updatePayment(id: Long, paymentDto: PaymentDto): PaymentDto {
-        val payment = objectMapper.convertValue(paymentDto, Payment::class.java).apply {
+        val payment = convertPaymentDtoToPayment(paymentDto).apply {
             this.id = paymentDto.id
         }
 
         paymentRepository.save(payment)
 
-        return objectMapper.convertValue(payment, PaymentDto::class.java)
+        return convertPaymentToPaymentDto(payment)
     }
 
     fun deletePayment(id: Long) {
         paymentRepository.deleteById(id)
     }
+
+    fun confirmPayment(id: Long) {
+        val payment = findPaymentById(id).apply {
+            status = Status.CONFIRMED
+        }
+
+        paymentRepository.save(payment)
+
+        ordersClient.approveOrderPayment(payment.orderId)
+    }
+
+    private fun findPaymentById(id: Long): Payment =
+        paymentRepository.findById(id).orElseThrow { EntityNotFoundException() }
+
+    private fun convertPaymentDtoToPayment(paymentDto: PaymentDto): Payment =
+        objectMapper.convertValue(paymentDto, Payment::class.java)
+
+    private fun convertPaymentToPaymentDto(payment: Payment): PaymentDto =
+        objectMapper.convertValue(payment, PaymentDto::class.java)
 }
