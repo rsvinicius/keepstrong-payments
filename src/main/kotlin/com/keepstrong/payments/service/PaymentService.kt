@@ -6,6 +6,7 @@ import com.keepstrong.payments.model.Status
 import com.keepstrong.payments.model.dto.PaymentDto
 import com.keepstrong.payments.model.entity.Payment
 import com.keepstrong.payments.repository.PaymentRepository
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -54,6 +55,7 @@ class PaymentService(
         paymentRepository.deleteById(id)
     }
 
+    @CircuitBreaker(name = "confirmPayment", fallbackMethod = "pendingAuthorizedPaymentIntegration")
     fun confirmPayment(id: Long) {
         val payment = findPaymentById(id).apply {
             status = Status.CONFIRMED
@@ -62,6 +64,14 @@ class PaymentService(
         paymentRepository.save(payment)
 
         ordersClient.approveOrderPayment(payment.orderId)
+    }
+
+    fun pendingAuthorizedPaymentIntegration(id: Long, throwable: Throwable) {
+        val payment = findPaymentById(id).apply {
+            status = Status.CONFIRMED_WITHOUT_INTEGRATION
+        }
+
+        paymentRepository.save(payment)
     }
 
     private fun findPaymentById(id: Long): Payment =
