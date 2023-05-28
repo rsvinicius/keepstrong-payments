@@ -14,6 +14,11 @@ spring:
     hibernate:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
 
 eureka:
   client:
