@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotNull
+import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -29,10 +30,13 @@ import org.springframework.web.util.UriComponentsBuilder
 @RestController
 @Validated
 @RequestMapping("/payments")
-class PaymentController(private val paymentService: PaymentService) {
+class PaymentController(
+        private val paymentService: PaymentService,
+        private val rabbitTemplate: RabbitTemplate
+) {
     @Operation(summary = "List all payments")
     @ApiResponses(
-        ApiResponse(responseCode = "200", description = "All payments listed"),
+            ApiResponse(responseCode = "200", description = "All payments listed"),
     )
     @GetMapping
     fun listAllPayments(@PageableDefault(size = 10) pageable: Pageable): Page<PaymentDto> {
@@ -41,8 +45,8 @@ class PaymentController(private val paymentService: PaymentService) {
 
     @Operation(summary = "Get payment by id")
     @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Payment found"),
-        ApiResponse(responseCode = "404", description = "Payment not found")
+            ApiResponse(responseCode = "200", description = "Payment found"),
+            ApiResponse(responseCode = "404", description = "Payment not found")
     )
     @GetMapping("/{id}")
     fun getPaymentById(@PathVariable @NotNull id: Long): ResponseEntity<PaymentDto> {
@@ -53,27 +57,29 @@ class PaymentController(private val paymentService: PaymentService) {
 
     @Operation(summary = "Create payment")
     @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Payment created")
+            ApiResponse(responseCode = "200", description = "Payment created")
     )
     @PostMapping
     fun registerPayment(
-        @RequestBody @Valid paymentDto: PaymentDto,
-        uriBuilder: UriComponentsBuilder
+            @RequestBody @Valid paymentDto: PaymentDto,
+            uriBuilder: UriComponentsBuilder
     ): ResponseEntity<PaymentDto> {
         val createdPaymentDto = paymentService.createPayment(paymentDto)
         val address = uriBuilder.path("/payments/{id}").buildAndExpand(createdPaymentDto.id).toUri()
+
+        rabbitTemplate.convertAndSend("payment.finished", createdPaymentDto)
 
         return ResponseEntity.created(address).body(createdPaymentDto)
     }
 
     @Operation(summary = "Update payment")
     @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Payment updated")
+            ApiResponse(responseCode = "200", description = "Payment updated")
     )
     @PutMapping("/{id}")
     fun updatePayment(
-        @PathVariable @NotNull id: Long,
-        @RequestBody @Valid paymentDto: PaymentDto
+            @PathVariable @NotNull id: Long,
+            @RequestBody @Valid paymentDto: PaymentDto
     ): ResponseEntity<PaymentDto> {
         val updatedPaymentDto = paymentService.updatePayment(id, paymentDto)
 
@@ -82,7 +88,7 @@ class PaymentController(private val paymentService: PaymentService) {
 
     @Operation(summary = "Delete payment")
     @ApiResponses(
-        ApiResponse(responseCode = "204", description = "Payment deleted")
+            ApiResponse(responseCode = "204", description = "Payment deleted")
     )
     @DeleteMapping("/{id}")
     fun deletePayment(@PathVariable @NotNull id: Long): ResponseEntity<PaymentDto> {
@@ -93,11 +99,11 @@ class PaymentController(private val paymentService: PaymentService) {
 
     @Operation(summary = "Confirm payment")
     @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Payment confirmed")
+            ApiResponse(responseCode = "200", description = "Payment confirmed")
     )
     @PatchMapping("/{id}/confirm")
     fun confirmPayment(
-        @PathVariable @NotNull id: Long
+            @PathVariable @NotNull id: Long
     ): ResponseEntity<Unit> {
         paymentService.confirmPayment(id)
 
@@ -106,8 +112,8 @@ class PaymentController(private val paymentService: PaymentService) {
 
     @GetMapping("/port")
     fun getPort(
-        @Value("\${local.server.port}")
-        port: String
+            @Value("\${local.server.port}")
+            port: String
     ): String {
         return String.format("Request served by the instance running on the port %s", port)
     }
