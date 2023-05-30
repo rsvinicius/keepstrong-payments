@@ -67,7 +67,7 @@ class PaymentController(
         val createdPaymentDto = paymentService.createPayment(paymentDto)
         val address = uriBuilder.path("/payments/{id}").buildAndExpand(createdPaymentDto.id).toUri()
 
-        rabbitTemplate.convertAndSend("payment.finished", createdPaymentDto)
+        rabbitTemplate.convertAndSend("payment.ex", "", createdPaymentDto)
 
         return ResponseEntity.created(address).body(createdPaymentDto)
     }
